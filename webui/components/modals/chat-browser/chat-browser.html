@@ -1,0 +1,284 @@
+<html>
+<head>
+  <title>Chat Browser</title>
+  <script type="module">
+    import { store } from "/components/modals/chat-browser/chat-browser-store.js";
+  </script>
+</head>
+<body>
+  <div x-data>
+    <template x-if="$store.chatBrowser">
+      <div class="chat-browser-root">
+
+        <!-- Search -->
+        <div class="cb-search-bar">
+          <input type="text" class="cb-search-input"
+            placeholder="Search chats..."
+            x-model="$store.chatBrowser.searchQuery" />
+        </div>
+
+        <!-- Filters row -->
+        <div class="cb-filters">
+          <div class="cb-filter-group">
+            <label class="cb-filter-label">Project:</label>
+            <select class="cb-select" x-model="$store.chatBrowser.projectFilter">
+              <option value="all">All Chats</option>
+              <option value="none">No Project</option>
+              <template x-for="proj in $store.chatBrowser.uniqueProjects" :key="proj.name">
+                <option :value="proj.name" x-text="proj.title"></option>
+              </template>
+            </select>
+          </div>
+          <div class="cb-filter-group">
+            <label class="cb-filter-label">Sort:</label>
+            <select class="cb-select" x-model="$store.chatBrowser.sortBy">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="name-asc">Name A-Z</option>
+              <option value="name-desc">Name Z-A</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Chat list -->
+        <div class="cb-list">
+          <template x-for="ctx in $store.chatBrowser.filteredChats" :key="ctx.id">
+            <div class="cb-item" @click="$store.chatBrowser.selectChat(ctx.id)"
+              :class="{ 'cb-item-selected': ctx.id === $store.chats.selected }">
+              <div class="cb-item-main">
+                <span class="project-color-ball"
+                  :style="ctx.project?.color ? { backgroundColor: ctx.project.color } : { border: '1px solid var(--color-border)' }"></span>
+                <span class="cb-item-name" x-text="ctx.name ? ctx.name : 'Chat #' + ctx.no"></span>
+              </div>
+              <div class="cb-item-meta">
+                <span class="cb-item-project" x-show="ctx.project?.title || ctx.project?.name"
+                  x-text="ctx.project?.title || ctx.project?.name"></span>
+                <span class="cb-item-date" x-text="$store.chatBrowser.formatDate(ctx.created_at)"></span>
+              </div>
+            </div>
+          </template>
+
+          <!-- Empty state -->
+          <div class="cb-empty" x-show="$store.chatBrowser.filteredCount === 0">
+            <p>No chats found</p>
+          </div>
+        </div>
+
+      </div>
+    </template>
+
+    <!-- Footer -->
+    <template x-if="$store.chatBrowser">
+      <div class="modal-footer" data-modal-footer>
+        <span class="cb-footer-count"
+          x-text="'Showing ' + $store.chatBrowser.filteredCount + ' of ' + $store.chatBrowser.totalCount + ' chats'"></span>
+        <button class="btn btn-cancel" @click="$store.chatBrowser.handleClose()">Close</button>
+      </div>
+    </template>
+  </div>
+
+  <style>
+    .chat-browser-root {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-height: 300px;
+    }
+
+    /* Search bar */
+    .cb-search-bar {
+      padding: 0 var(--spacing-sm);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .cb-search-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      background: var(--color-message-bg);
+      color: var(--color-text);
+      font-size: var(--font-size-normal);
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .cb-search-input:focus {
+      border-color: var(--color-primary);
+    }
+
+    .cb-search-input::placeholder {
+      color: var(--color-text);
+      opacity: 0.4;
+    }
+
+    /* Filters */
+    .cb-filters {
+      display: flex;
+      gap: 1rem;
+      padding: 0 var(--spacing-sm);
+      margin-bottom: var(--spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    .cb-filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .cb-filter-label {
+      font-size: var(--font-size-small);
+      color: var(--color-text);
+      opacity: 0.7;
+      white-space: nowrap;
+    }
+
+    .cb-select {
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      background: var(--color-message-bg);
+      color: var(--color-text);
+      font-size: var(--font-size-small);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .cb-select:focus {
+      border-color: var(--color-primary);
+    }
+
+    /* Chat list */
+    .cb-list {
+      display: flex;
+      flex-direction: column;
+      padding: 0 var(--spacing-sm);
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+
+    .cb-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .cb-list::-webkit-scrollbar-thumb {
+      background: rgba(155, 155, 155, 0.5);
+      border-radius: 3px;
+    }
+    .cb-list::-webkit-scrollbar-thumb:hover {
+      background: rgba(155, 155, 155, 0.7);
+    }
+
+    /* Chat item */
+    .cb-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.15s ease-in-out;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .cb-item:last-child {
+      border-bottom: none;
+    }
+
+    .cb-item:hover {
+      background-color: var(--color-background-hover);
+    }
+
+    .cb-item-selected {
+      background-color: var(--color-background-hover);
+    }
+
+    .cb-item-main {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cb-item-main .project-color-ball {
+      width: 0.6em;
+      height: 0.6em;
+      border-radius: 50%;
+      display: inline-block;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    .cb-item-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: var(--font-size-normal);
+    }
+
+    .cb-item-selected .cb-item-name {
+      font-weight: bold;
+    }
+
+    .cb-item-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+      margin-left: 1rem;
+    }
+
+    .cb-item-project {
+      font-size: var(--font-size-small);
+      color: var(--color-text);
+      opacity: 0.5;
+      white-space: nowrap;
+    }
+
+    .cb-item-date {
+      font-size: var(--font-size-small);
+      color: var(--color-text);
+      opacity: 0.5;
+      white-space: nowrap;
+    }
+
+    /* Empty state */
+    .cb-empty {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 120px;
+      color: var(--color-text);
+      opacity: 0.5;
+      font-style: italic;
+    }
+
+    /* Footer */
+    .cb-footer-count {
+      font-size: var(--font-size-small);
+      color: var(--color-text);
+      opacity: 0.6;
+      margin-right: auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 540px) {
+      .cb-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+      }
+
+      .cb-item-meta {
+        margin-left: 1.1em;
+      }
+
+      .cb-filters {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</body>
+</html>

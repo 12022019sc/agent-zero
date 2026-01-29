@@ -3,6 +3,7 @@
 <head>
   <script type="module">
     import { store } from "/components/sidebar/chats/chats-store.js";
+    import { store as chatBrowserStore } from "/components/modals/chat-browser/chat-browser-store.js";
   </script>
 </head>
 
@@ -10,7 +11,16 @@
   <div x-data>
     <template x-if="$store.chats">
       <div class="chats-list-container" x-data>
-        <h3 class="section-header">Chats</h3>
+        <h3 class="section-header">
+          Chats
+          <button class="browse-chats-btn"
+            @click="$store.chatBrowser.open()"
+            title="Browse all chats">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+              <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.45 4.39l3.58 3.58a.75.75 0 1 1-1.06 1.06l-3.58-3.58A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </h3>
         <ul class="config-list chats-config-list" x-show="$store.chats.contexts.length > 0">
           <template x-for="context in $store.chats.contexts" :key="context.id">
             <li>
@@ -40,6 +50,28 @@
       top: 0;
       flex-shrink: 0;
       z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .browse-chats-btn {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      color: var(--color-primary);
+      cursor: pointer;
+      padding: 2px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.6;
+      transition: opacity 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    }
+
+    .browse-chats-btn:hover {
+      opacity: 1;
+      border-color: var(--color-primary);
     }
 
     /* Chats list container and items */
