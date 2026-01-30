@@ -396,7 +396,7 @@ const model = {
   },
 
   getSelectedAbsPath(...relPath) {
-    return ["/a0/usr/projects", this.selectedProject.name, ...relPath]
+    return ["/home/shayne/agent-zero/usr/projects", this.selectedProject.name, ...relPath]
       .join("/")
       .replace(/\/+/g, "/");
   },
