@@ -1,0 +1,36 @@
+#!/bin/bash
+# Agent Zero with Automatic Memory Support
+
+# Set up environment
+export PATH="/root/.local/bin:/home/shayne/agent-zero/bin:$PATH"
+export MCP_MEMORY_DAEMON_AUTO_START="true"
+
+# Start memory daemon automatically
+MEMORY_DAEMON_SCRIPT="/home/shayne/agent-zero/bin/mcp-memory-daemon"
+if [ -f "$MEMORY_DAEMON_SCRIPT" ]; then
+    $MEMORY_DAEMON_SCRIPT start
+fi
+
+# Function to cleanup on exit
+cleanup() {
+    echo "Shutting down Agent Zero and stopping memory daemon..."
+    if [ -f "$MEMORY_DAEMON_SCRIPT" ]; then
+        $MEMORY_DAEMON_SCRIPT stop
+    fi
+}
+
+# Register cleanup function to be called on exit
+trap cleanup EXIT
+
+# Check if an Agent Zero binary or script exists
+if [ -f "/home/shayne/agent-zero/agent-zero" ]; then
+    # Launch Agent Zero binary
+    exec /home/shayne/agent-zero/agent-zero "$@"
+elif [ -f "/home/shayne/agent-zero/run_agent_zero.py" ]; then
+    # Launch Agent Zero Python script
+    exec python3 /home/shayne/agent-zero/run_agent_zero.py "$@"
+else
+    echo "Agent Zero executable not found."
+    echo "Please ensure Agent Zero is installed at /home/shayne/agent-zero/agent-zero or /home/shayne/agent-zero/run_agent_zero.py"
+    exit 1
+fi

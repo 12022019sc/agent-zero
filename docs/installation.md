@@ -108,7 +108,7 @@ Optionally you can map local folders for file persistence:
 > By mapping the whole `/a0` directory to a local directory, you will run into problems when upgrading Agent Zero to a newer version.
 - OPTIONAL: Under "Volumes", configure your mapped folders, if needed:
   - Example host path: Your chosen directory (e.g., `C:\agent-zero\memory`)
-  - Example container path: `/a0/memory`
+  - Example container path: `/home/shayne/agent-zero/memory`
 
 
 - Click the `Run` button in the "Images" tab.

@@ -92,8 +92,8 @@ def _get_default_patterns(self) -> str:
 **Example Resolved Patterns** (varies by environment):
 ```
 # Docker container environment
-/a0/knowledge/**
-!/a0/knowledge/default/**
+/home/shayne/agent-zero/knowledge/**
+!/home/shayne/agent-zero/knowledge/default/**
 /root/**
 !/root/.*/**
 !/root/.*
@@ -1378,16 +1378,16 @@ The backup archive includes a comprehensive `metadata.json` file with the follow
   "include_hidden": boolean,
 
   "include_patterns": [
-    "/a0/knowledge/**",
-    "/a0/instruments/**",
-    "/a0/memory/**",
-    "/a0/.env",
-    "/a0/tmp/settings.json"
+    "/home/shayne/agent-zero/knowledge/**",
+    "/home/shayne/agent-zero/instruments/**",
+    "/home/shayne/agent-zero/memory/**",
+    "/home/shayne/agent-zero/.env",
+    "/home/shayne/agent-zero/tmp/settings.json"
   ],
   "exclude_patterns": [
-    "/a0/knowledge/default/**",
-    "/a0/instruments/default/**",
-    "/a0/memory/embeddings/**"
+    "/home/shayne/agent-zero/knowledge/default/**",
+    "/home/shayne/agent-zero/instruments/default/**",
+    "/home/shayne/agent-zero/memory/embeddings/**"
   ],
 
   "system_info": { /* platform, architecture, etc. */ },
@@ -1544,11 +1544,11 @@ if not include_hidden and file.startswith('.'):
 
 ### **Critical Issue Fixed: Hidden Files**
 
-**Problem:** When `include_hidden=false`, the system was excluding ALL hidden files, even when they were explicitly specified in patterns like `/a0/.env`.
+**Problem:** When `include_hidden=false`, the system was excluding ALL hidden files, even when they were explicitly specified in patterns like `/home/shayne/agent-zero/.env`.
 
 **Solution:** Implemented explicit pattern detection that distinguishes between:
-- **Explicit patterns** (like `/a0/.env`) - Always included regardless of `include_hidden` setting
-- **Wildcard discoveries** (like `/a0/*`) - Respect the `include_hidden` setting
+- **Explicit patterns** (like `/home/shayne/agent-zero/.env`) - Always included regardless of `include_hidden` setting
+- **Wildcard discoveries** (like `/home/shayne/agent-zero/*`) - Respect the `include_hidden` setting
 
 **Result:** Critical files like `.env` are now properly backed up when explicitly specified, ensuring Agent Zero configurations are preserved.
 
