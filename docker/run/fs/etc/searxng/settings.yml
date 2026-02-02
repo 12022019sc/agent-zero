@@ -21,6 +21,7 @@ search:
 server:
   # Is overwritten by ${SEARXNG_SECRET}
   secret_key: "dummy"
+  bind_address: "127.0.0.1"
   port: 55510
   limiter: false
   image_proxy: false
